@@ -11,12 +11,10 @@ export const TopBar = () => {
           <p className="text-right text-xs leading-4">Hi, John</p>
         </div>
         <div className="container mx-auto flex items-center justify-between py-4">
-          {/* Left Side - App Title */}
           <div className="flex items-center">
             <p className="text-left text-2xl font-bold leading-10">ECOMMERCE</p>
           </div>
 
-          {/* Middle Part - Sale, Stock, Buy */}
           <div className="flex flex-grow justify-center space-x-8">
             <p className="text-left text-base font-semibold leading-6">
               Categories
@@ -33,7 +31,6 @@ export const TopBar = () => {
             </p>
           </div>
 
-          {/* Right Side - Help, Orders, Return, Search Icon, Cart Icon */}
           <div className="flex items-center space-x-4">
             <CiSearch size={25} />
             <CiShoppingCart size={25} />
