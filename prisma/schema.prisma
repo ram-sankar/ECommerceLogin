@@ -16,3 +16,15 @@ model users {
     email     String
     password  String
 }
+
+model product_categories {
+    id            Int      @id @default(autoincrement())
+    category_name String
+}
+
+model user_category_relation {
+    category_id Int
+    user_id Int
+
+    @@id([category_id, user_id])
+}

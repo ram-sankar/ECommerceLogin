@@ -19,29 +19,41 @@ export const userRouter = createTRPCRouter({
         }
       })
     }),
-    login: publicProcedure
-      .input(z.object({ 
-        email: z.string().email(),
-        password: z.string().min(6)
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const user = await ctx.db.users.findFirst({
-          where: {
-            email: input.email,
-          },
-        });
+  login: publicProcedure
+    .input(z.object({ 
+      email: z.string().email(),
+      password: z.string().min(6)
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.users.findFirst({
+        where: {
+          email: input.email,
+        },
+      });
 
-        if (!user) {
-          throw new Error("Invalid credentials");
+      if (!user) {
+        throw new Error("Invalid credentials");
+      }
+
+      const passwordMatch = await bcrypt.compare(input.password, user.password);
+
+      if (!passwordMatch) {
+        throw new Error("Invalid credentials");
+      }
+
+      return user;
+    }),
+  addCategory: publicProcedure
+    .input(z.object({ 
+      user_id: z.number(),
+      category_id: z.number()
+    }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.user_category_relation.create({
+        data: {
+          user_id: input.user_id,
+          category_id: input.category_id,
         }
-console.log(user);
-
-        const passwordMatch = await bcrypt.compare(input.password, user.password);
-
-        if (!passwordMatch) {
-          throw new Error("Invalid credentials");
-        }
-
-        return user;
-      }),
+      })
+    })
 });

@@ -9,6 +9,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { maskEmail } from "@/shared/helper";
 import OtpInput from "@/components/OtpInput";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [name, setName] = useState("ram3");
@@ -17,28 +18,34 @@ export default function Home() {
   const [otp, setOTP] = useState("");
   const [isOTPSent, setIsOTPSent] = useState(true);
 
+  const router = useRouter();
   const createUser = api.user.create.useMutation(({
     onSuccess: (res) => {
       console.log(res)
+      setIsOTPSent(true)
     },
     onError: (error) => {
       console.log(error)
     }
   }));
 
-  const registerUser = async (newOtpVal?: string) => {
-    if (newOtpVal != "12345678" && otp != "12345678") {
-      console.log("Invalid OTP")
-      return
-    }
+  const createNewUser = async () => {
     const hashedPassword = await bcrypt.hash(password, 10)
     const payload = {
         name, 
         email,
         password: hashedPassword
     }
-    console.log(payload)
-    createUser.mutate(payload)
+    await createUser.mutate(payload)
+  }
+
+  const loginUser = async (newOtpVal?: string) => {
+    if (newOtpVal != "12345678" && otp != "12345678") {
+      console.log("Invalid OTP")
+      return
+    }
+    localStorage.setItem("logged_in_user", email)
+    router.push("/home")
   }
 
   const RenderCreateAccountForm = () => (
@@ -73,7 +80,7 @@ export default function Home() {
 
             <div>
               <Button type="submit" 
-                onClick={() => setIsOTPSent(true)}>
+                onClick={createNewUser}>
                 CREATE ACCOUNT
               </Button>
             </div>
@@ -89,14 +96,11 @@ export default function Home() {
   )
 
   const RenderOTPForm = () => {
+
     const handleOTPChange = (val: string) => {
       setOTP(val)
       if (val?.length === 8) {
-        if (val === "12345678") {
-          registerUser(val)
-        } else {
-          console.log("Invalid OTP")
-        }
+          loginUser(val)
       }
     }
     return (
@@ -117,7 +121,7 @@ export default function Home() {
 
           <div className="mt-12">
             <Button type="submit" 
-              onClick={registerUser}>
+              onClick={loginUser}>
               VERIFY
             </Button>
           </div>
